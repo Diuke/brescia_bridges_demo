@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
+
     'db_demo' 
 ]
 
@@ -78,10 +78,10 @@ WSGI_APPLICATION = 'brescia_bridges_demo.wsgi.application'
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "ponti_db_test",
-        "USER": "postgres",
-        "PASSWORD": "postgres",
-        "HOST": "127.0.0.1",
+        "NAME": "d5hi7gfahsqc88",
+        "USER": "omvhpjcckhqazc",
+        "PASSWORD": "f49a7ee1b3176696c2462fe8bb9fb84b4acee857f37cc3609a98ae3d4bc10f73",
+        "HOST": "ec2-54-73-22-169.eu-west-1.compute.amazonaws.com",
         "PORT": "5432",
     }
 }
