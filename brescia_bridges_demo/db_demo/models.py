@@ -120,8 +120,19 @@ class Inspection(models.Model):
 class Level1(models.Model):
     #enums
     class StructureType(models.TextChoices):
-        ARCO_MURATURA = "AM", _("Arco in Muratura")
-        OTHER = "OT", _("Other")
+        ARCO_MURATURA = "ARCOM", _("Arco in Muratura")
+        TRAVATE_APPOGGIATE = "TRAVA", _("Travate appoggiate")
+        TRAVATE_CONTINUE = "TRAVC", _("Travate continue")
+        SOLETTA_CA = "SOLCA", _("Soletta in C.A.")
+        SEZIONE_TUBOLARE_CA = "SZTCA", _("Sezione tubolare in c.a.")
+        ARCO_CA = "ARCOC", _("Arco in C.A.")
+        TRAVATE_GERBER = "TRAVG", _("Travate Gerber")
+        CASSONE_PRECOMPRESSO = "CASSP", _("Cassone in Precompresso")
+        SEZIONE_TUBOLARE_ACCIAIO = "SZTAC", _("Sezione tubolare in acciaio")
+        ARCO_ACCIAIO = "ARCOA", _("Arco in acciaio")
+        STRALLATO_O_SOSPESO = "STOSO", _("Strallato o sospeso")
+        TRAVATE_CAP_CAVI_POST_TESI = "TRCPT", _("Travate in c.a.p. a cavi post-tesi")
+        OTHER = "OTHER", _("Other")
 
     street = models.CharField(max_length=255,default="")
     km = models.CharField(max_length=255,default="")
@@ -130,7 +141,7 @@ class Level1(models.Model):
 
     structure_type = models.CharField(
         choices=StructureType.choices,
-        max_length=2,
+        max_length=5,
         default=StructureType.OTHER,
     )
     structure_type_other = models.CharField(max_length=255, null=True, blank=True, default=None)
@@ -150,6 +161,7 @@ class Level1(models.Model):
 
 class FormDefects(models.Model):
     piece_number = models.IntegerField(default=1)
+    notes = models.TextField(default="", blank=True)
     
     level_1 = models.ForeignKey(
         "Level1",
@@ -263,6 +275,9 @@ class Defect(models.Model):
     )
 
     piece = models.ManyToManyField(Piece)
+
+    def __str__(self):
+        return str(self.code) + " - " + str(self.description)
 
     class Meta:
         db_table = "defect"

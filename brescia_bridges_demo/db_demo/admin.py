@@ -9,9 +9,17 @@ admin.site.register(db_models.ProjectDoc)
 admin.site.register(db_models.Maintenance)
 admin.site.register(db_models.Inspection)
 admin.site.register(db_models.Level1)
-admin.site.register(db_models.Piece)
-#admin.site.register(db_models.FormDefectsAnswer)
-admin.site.register(db_models.Defect)
+
+@admin.register(db_models.Piece)
+class PieceAdmin(admin.ModelAdmin):
+    ordering = ['id']
+
+@admin.register(db_models.Defect)
+class DefectAdmin(admin.ModelAdmin):
+    ordering = ['code']
+    search_fields = ['code', 'description']
+
+
 
 class FormDefectsAnswerInline(admin.TabularInline):
     model = db_models.FormDefectsAnswer
