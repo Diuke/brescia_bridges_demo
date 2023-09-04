@@ -1,0 +1,90 @@
+{% load i18n l10n %}
+
+<div id="{{ id }}_div_map" class="dj_map_wrapper">
+    {# RemovedInDjango51Warning: when the deprecation ends, remove data-width and data-height attributes. #}
+    <div id="{{ id }}_map" class="dj_map" data-width="{{ map_width }}" data-height="{{ map_height }}"></div>
+    {% if not disabled %}<span class="clear_features"><a href="">{% translate "Delete all Features" %}</a></span>{% endif %}
+    {% if display_raw %}<p>{% translate "Debugging window (serialized value)" %}</p>{% endif %}
+    <textarea id="{{ id }}" class="vSerializedField required" cols="150" rows="10" name="{{ name }}"
+              {% if not display_raw %} hidden{% endif %}>{{ serialized }}</textarea>
+    <script>
+        {% block base_layer %}
+        var base_layer = new ol.layer.Tile({source: new ol.source.OSM()});
+
+        {% endblock %}
+        
+        var options = {
+            base_layer: base_layer,
+            geom_name: '{{ geom_type }}',
+            id: '{{ id }}',
+            map_id: '{{ id }}_map',
+            map_srid: {{ map_srid|unlocalize }},
+            name: '{{ name }}'
+        };
+
+        options['default_lon'] = {{ default_lon|unlocalize }};
+        options['default_lat'] = {{ default_lat|unlocalize }};
+        options['default_zoom'] = {{ default_zoom|unlocalize }};
+
+        //OL map instance
+        var mapWidget = new MapWidget(options);
+
+        mapWidget.featureOverlay.setStyle(
+            new ol.style.Style({
+                image: new ol.style.Circle({
+                    radius: 7,
+                    fill: new ol.style.Fill({color: 'black'}),
+                    stroke: new ol.style.Stroke({
+                        color: [255,0,0], width: 2
+                    })
+                })
+            
+            })
+        );
+
+        let pointInitialValue = document.getElementById(this.options.id).value;
+
+        let latitudeInput = document.getElementById("id_level_0_geometry-0-lng");
+        latitudeInput.addEventListener('change', (event) => {
+            if(mapWidget.featureCollection && mapWidget.featureCollection.getArray().length > 0){
+                let featureGeometry = mapWidget.featureCollection.getArray()[0].getGeometry();
+                let featureCoordinates = featureGeometry.getCoordinates();
+                featureCoordinates[0] = parseFloat(event.target.value);
+                featureGeometry.setCoordinates(featureCoordinates);
+
+            }
+        });
+
+        let longitudeInput = document.getElementById("id_level_0_geometry-0-lat");
+        longitudeInput.addEventListener('change', (event) => {
+            if(mapWidget.featureCollection && mapWidget.featureCollection.getArray().length > 0){
+                let featureGeometry = mapWidget.featureCollection.getArray()[0].getGeometry();
+                let featureCoordinates = featureGeometry.getCoordinates();
+                featureCoordinates[1] = parseFloat(event.target.value);
+                featureGeometry.setCoordinates(featureCoordinates);
+
+            }
+        });
+
+         //If the pointInitialValue is empty, means that there is no point added
+        if(pointInitialValue == ""){
+            let initialPointCoordinates = [ options['default_lon'], options['default_lat'] ];
+            let initialPoint = new ol.geom.Point(
+                initialPointCoordinates
+            ).transform('EPSG:4326', 'EPSG:3857');
+
+            let initialFeature = new ol.Feature({
+                geometry: initialPoint,
+                name: "Initial"
+            });
+
+            mapWidget.featureOverlay.getSource().addFeature(initialFeature);
+            longitudeInput.value = initialPoint.getCoordinates()[1];
+            latitudeInput.value = initialPoint.getCoordinates()[0];
+        }
+
+        mapWidget.interactions.modify.setActive(false);
+        mapWidget.interactions.draw.setActive(false);
+        
+    </script>
+</div>
